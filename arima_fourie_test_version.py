@@ -7,7 +7,7 @@ from pmdarima import pipeline
 from pmdarima import preprocessing as ppc
 from pmdarima import arima
 from datetime import date
-from password import *
+# from password import *
 from tqdm import tqdm
 
 def get_df(host, port, dbname, username, password, query):
@@ -175,16 +175,16 @@ warnings.filterwarnings('ignore')
 # Получаем сегодняшнюю дату
 today_date = date.today()
 # Получаем данные подключения к базе данных
-db_name, db_user, db_host, db_password, db_port, db_type = my_data()
-# Формируем SQL запрос
-sql = ("SELECT date,category product,value avg_price,region_name,region_code\n"
-       "         FROM khd_kc.dal_data.p_rind_week_price_history_2020_2021\n"
-       "         WHERE region_code IS NOT NULL\n"
-       "         UNION SELECT date,product,avg_price,region_name,region_code\n"
-       "         FROM khd_kc.dal_data.p_mprs_rst_002_a_food_price\n"
-       "         WHERE region_code IS NOT NULL")
-df_product_price = get_df(host=db_host, port=db_port, dbname=db_name, username=db_user, password=db_password, query=sql)
-
+# db_name, db_user, db_host, db_password, db_port, db_type = my_data()
+# # Формируем SQL запрос
+# sql = ("SELECT date,category product,value avg_price,region_name,region_code\n"
+#        "         FROM khd_kc.dal_data.p_rind_week_price_history_2020_2021\n"
+#        "         WHERE region_code IS NOT NULL\n"
+#        "         UNION SELECT date,product,avg_price,region_name,region_code\n"
+#        "         FROM khd_kc.dal_data.p_mprs_rst_002_a_food_price\n"
+#        "         WHERE region_code IS NOT NULL")
+# df_product_price = get_df(host=db_host, port=db_port, dbname=db_name, username=db_user, password=db_password, query=sql)
+df_product_price = pd.read_csv('test_date.csv')
 # Формируем словарь с кодом региона
 region_code_dict = dict(zip(list(df_product_price.drop_duplicates(subset=['region_name'])['region_name']),
                             list(df_product_price.drop_duplicates(subset=['region_name'])['region_code'])))
@@ -198,8 +198,8 @@ for region in df_product_price_weekly.keys():
     print('\n',f'Обрабатывается {region}'.center(len(f'Обрабатывается {region}') + 60, '-'),end='\n')
     # Отчистим данные от не полных временных рядов
     df_one_region = clean_data(df_prices=df_product_price_weekly[region])
-    product_list = tqdm(list(df_one_region.columns)[1:3], desc='Формируется прогноз для', leave=True,
-                        total=len(list(df_one_region.columns)[1:3]))
+    product_list = tqdm(list(df_one_region.columns), desc='Формируется прогноз для', leave=True,
+                        total=len(list(df_one_region.columns)))
     for product in product_list:
         # Позволяет менять название индикатора продукта в зависимости от названия продукта
         product_list.set_description(f"Формируется прогноз для: {product}")
