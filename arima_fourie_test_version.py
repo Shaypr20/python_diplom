@@ -1,14 +1,13 @@
-import pandas as pd
-import missingno as mi
-import numpy as np
-import warnings
-import psycopg2 as ps
-from pmdarima import pipeline
-from pmdarima import preprocessing as ppc
-from pmdarima import arima
-from datetime import date
+import pandas as pd # для работы с таблицами
+import missingno as mi # визуаллизация пропусков
+import warnings # предупреждения
+import psycopg2 as ps # работа с бд
+from pmdarima import pipeline # поочередная загрузка программ
+from pmdarima import preprocessing as ppc # работа с моделями
+from pmdarima import arima # работа с моделями
+from datetime import date # работа с датами
 # from password import *
-from tqdm import tqdm
+from tqdm import tqdm # прогрессбар
 
 def get_df(host, port, dbname, username, password, query):
     """Функция позволяет подключиться к базе данных и выгрузить данные через sql запрос"""
@@ -35,8 +34,8 @@ def weekly_data(df_with_product_price):
     for region in ['Белгородская область','Пермский край']:
         all_products = {}
         all_products_test = {}
-        product_list_weekly = tqdm(list(df_product_price['product'].unique()), desc='Преобразование даты в недельный формат',
-                            leave=True, total=len(list(df_product_price['product'].unique())))
+        product_list_weekly = tqdm(list(df_with_product_price['product'].unique()), desc='Преобразование даты в недельный формат',
+                            leave=True, total=len(list(df_with_product_price['product'].unique())))
         for product in product_list_weekly:
             product_list_weekly.set_description(f"""Преобразование даты в недельный формат в регионе {region}: {product}""")
             product_list_weekly.refresh()
@@ -72,7 +71,7 @@ def weekly_data(df_with_product_price):
             df0 = df0.rename(columns={'avg_price': prod})
             df = pd.merge(df, df0, how='left')
         all_regions[region] = df
-    return all_regions
+    return all_regions # ассоц амассив, где ключ - регион, знач - таблица дата-цена
 
 
 def clean_data(df_prices, nan_percent_total: int = 30, visualization=False):
